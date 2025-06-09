@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dual Parabolic Wave Propagation Simulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .simulation-area {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .canvas-container {
+            flex: 1;
+            border: 2px solid #333;
+            border-radius: 5px;
+            background-color: #000;
+        }
+        
+        #simulationCanvas {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        
+        .controls {
+            width: 300px;
+            padding: 20px;
+            background-color: #f8f8f8;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .control-group input[type="range"] {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+        
+        .control-group input[type="number"] {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        
+        .control-group .value-display {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .start-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .start-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .stop-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .stop-btn:hover {
+            background-color: #da190b;
+        }
+        
+        .reset-btn {
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        .reset-btn:hover {
+            background-color: #0b7dda;
+        }
+        
+        .info-panel {
+            background-color: #e8f4fd;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid #2196F3;
+        }
+        
+        .info-panel h3 {
+            margin-top: 0;
+            color: #1976D2;
+        }
+        
+        .info-panel ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .info-panel li {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .legend {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff3cd;
+            border-radius: 5px;
+            border-left: 5px solid #ffc107;
+        }
+        
+        .legend h4 {
+            margin-top: 0;
+            color: #856404;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dual Parabolic Wave Propagation Simulation</h1>
+        
+        <div class="simulation-area">
+            <div class="canvas-container">
+                <canvas id="simulationCanvas" width="800" height="600"></canvas>
+            </div>
+            
+            <div class="controls">
+                <div class="button-group">
+                    <button id="startBtn" class="start-btn">Start</button>
+                    <button id="stopBtn" class="stop-btn">Stop</button>
+                    <button id="resetBtn" class="reset-btn">Reset</button>
+                </div>
+                
+                <div class="control-group">
+                    <label for="frequencySlider">Frequency (Hz)</label>
+                    <input type="range" id="frequencySlider" min="100" max="3000" value="1000" step="50">
+                    <div class="value-display" id="frequencyValue">1000 Hz</div>
+                </div>
+                
+                <div class="control-group">
+                    <label for="amplitudeSlider">Amplitude</label>
+                    <input type="range" id="amplitudeSlider" min="0.1" max="2.0" value="1.0" step="0.1">
+                    <div class="value-display" id="amplitudeValue">1.0</div>
+                </div>
+                
+                <div class="info-panel">
+                    <h3>Simulation Parameters</h3>
+                    <ul>
+                        <li><strong>Major Parabola:</strong> 20" (508mm) diameter</li>
+                        <li><strong>Major Focus:</strong> 100mm from vertex</li>
+                        <li><strong>Minor Parabola:</strong> 100mm diameter</li>
+                        <li><strong>Minor Focus:</strong> 50mm from vertex</li>
+                        <li><strong>Sound Speed:</strong> 343 m/s</li>
+                        <li><strong>Source:</strong> Point source at coincident focus</li>
+                    </ul>
+                </div>
+                
+                <div class="legend">
+                    <h4>Visualization Legend</h4>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: red;"></div>
+                        <span>Positive wave amplitude</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: blue;"></div>
+                        <span>Negative wave amplitude</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #333;"></div>
+                        <span>Parabolic boundaries</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: red; border-radius: 50%;"></div>
+                        <span>Sound source (focus point)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the simulation classes
+        import { DualParabolicWaveSimulation } from './dist/simulation.js';
+        
+        let simulation;
+        let isRunning = false;
+        
+        // Initialize simulation
+        function initSimulation() {
+            simulation = new DualParabolicWaveSimulation();
+            simulation.setupVisualization('simulationCanvas');
+        }
+        
+        // Control handlers
+        document.getElementById('startBtn').addEventListener('click', () => {
+            if (!isRunning) {
+                simulation.start();
+                isRunning = true;
+                document.getElementById('startBtn').textContent = 'Running...';
+            }
+        });
+        
+        document.getElementById('stopBtn').addEventListener('click', () => {
+            if (isRunning) {
+                simulation.stop();
+                isRunning = false;
+                document.getElementById('startBtn').textContent = 'Start';
+            }
+        });
+        
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            simulation.reset();
+            isRunning = false;
+            document.getElementById('startBtn').textContent = 'Start';
+        });
+        
+        // Frequency control
+        const frequencySlider = document.getElementById('frequencySlider');
+        const frequencyValue = document.getElementById('frequencyValue');
+        
+        frequencySlider.addEventListener('input', (e) => {
+            const frequency = parseInt(e.target.value);
+            frequencyValue.textContent = `${frequency} Hz`;
+            simulation.setFrequency(frequency);
+        });
+        
+        // Amplitude control
+        const amplitudeSlider = document.getElementById('amplitudeSlider');
+        const amplitudeValue = document.getElementById('amplitudeValue');
+        
+        amplitudeSlider.addEventListener('input', (e) => {
+            const amplitude = parseFloat(e.target.value);
+            amplitudeValue.textContent = amplitude.toFixed(1);
+            simulation.setAmplitude(amplitude);
+        });
+        
+        // Initialize when page loads
+        window.addEventListener('load', initSimulation);
+    </script>
+</body>
+</html>

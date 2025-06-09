@@ -1,0 +1,22 @@
+{
+  "name": "dual-parabolic-wave-simulation",
+  "version": "1.0.0",
+  "description": "Wave propagation simulation inside dual parabolic constraints",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "watch": "tsc --watch",
+    "serve": "python3 -m http.server 8000"
+  },
+  "keywords": ["wave", "propagation", "parabolic", "acoustics", "simulation"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
+  },
+  "dependencies": {}
+}
