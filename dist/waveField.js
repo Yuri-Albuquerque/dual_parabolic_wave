@@ -170,9 +170,18 @@ class WaveField {
         const focusJ = Math.round((this.focusPoint.x - xRange[0]) / dx);
         if (focusI >= 0 && focusI < gridSize && focusJ >= 0 && focusJ < gridSize) {
             if (this.boundaryMask[focusI][focusJ]) {
-                // Create a continuous sinusoidal source (following C++ q1 * source term)
-                const sourceAmplitude = this.waveParams.amplitude * 10.0; // Stronger source
-                const sourceValue = sourceAmplitude * Math.sin(2 * Math.PI * this.waveParams.frequency * time);
+                // Single pulse at initial time - Gaussian envelope with short duration
+                const pulseWidth = 1.0 / this.waveParams.frequency; // One period width
+                const pulseDuration = 2.0 * pulseWidth; // Duration of the pulse
+                let sourceValue = 0.0;
+                if (time <= pulseDuration) {
+                    // Gaussian envelope for smooth pulse
+                    const gaussianWidth = pulseWidth / 3.0;
+                    const envelope = Math.exp(-Math.pow(time - pulseWidth, 2) / (2 * gaussianWidth * gaussianWidth));
+                    // Single frequency pulse
+                    const sourceAmplitude = this.waveParams.amplitude * 10.0; // Stronger source
+                    sourceValue = sourceAmplitude * envelope * Math.sin(2 * Math.PI * this.waveParams.frequency * time);
+                }
                 // Apply source directly to the grid (this will be used in the next wave equation step)
                 // The C++ implementation adds q1 * source to the numerator
                 this.grid[focusI][focusJ] += sourceValue * 0.1; // Scale down to prevent instability

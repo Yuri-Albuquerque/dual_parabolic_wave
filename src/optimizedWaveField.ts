@@ -207,9 +207,20 @@ export class OptimizedWaveField {
             const index = this.focusI * gridSize + this.focusJ;
             
             if (this.boundaryMask[index]) {
-              const envelope = Math.exp(-0.1 * time);
-              const amplitude = this.waveParams.amplitude * 10.0 * envelope * 
-                               Math.sin(2 * Math.PI * this.waveParams.frequency * time);
+              // Single pulse at initial time - Gaussian envelope with short duration
+              const pulseWidth = 1.0 / this.waveParams.frequency; // One period width
+              const pulseDuration = 2.0 * pulseWidth; // Duration of the pulse
+              
+              let amplitude = 0.0;
+              if (time <= pulseDuration) {
+                // Gaussian envelope for smooth pulse
+                const gaussianWidth = pulseWidth / 3.0;
+                const envelope = Math.exp(-Math.pow(time - pulseWidth, 2) / (2 * gaussianWidth * gaussianWidth));
+                
+                // Single frequency pulse
+                amplitude = this.waveParams.amplitude * 10.0 * envelope * 
+                           Math.sin(2 * Math.PI * this.waveParams.frequency * time);
+              }
               
               this.sourceGrid[index] = amplitude;
 

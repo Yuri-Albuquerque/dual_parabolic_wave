@@ -382,9 +382,20 @@
                     const focusIndex = focusI * this.gridSize + focusJ;
                     
                     if (this.boundaryMask[focusIndex]) {
-                        // Create a continuous sinusoidal source (following C++ q1 * source term)
-                        const sourceAmplitude = this.amplitude * 10.0; // Stronger source
-                        const sourceValue = sourceAmplitude * Math.sin(2 * Math.PI * this.frequency * time);
+                        // Single pulse at initial time - Gaussian envelope with short duration
+                        const pulseWidth = 1.0 / this.frequency; // One period width
+                        const pulseDuration = 2.0 * pulseWidth; // Duration of the pulse
+                        
+                        let sourceValue = 0.0;
+                        if (time <= pulseDuration) {
+                            // Gaussian envelope for smooth pulse
+                            const gaussianWidth = pulseWidth / 3.0;
+                            const envelope = Math.exp(-Math.pow(time - pulseWidth, 2) / (2 * gaussianWidth * gaussianWidth));
+                            
+                            // Single frequency pulse
+                            const sourceAmplitude = this.amplitude * 10.0; // Stronger source
+                            sourceValue = sourceAmplitude * envelope * Math.sin(2 * Math.PI * this.frequency * time);
+                        }
                         
                         // Apply source directly to the grid
                         this.grid[focusIndex] += sourceValue * 0.1; // Scale down to prevent instability
